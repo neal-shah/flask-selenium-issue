@@ -1,0 +1,32 @@
+version: '3.5'
+services:
+  web:
+    volumes:
+      - ./app:/app
+    ports:
+      - "5000:80"
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_DEBUG=1
+      - 'RUN=flask run --host=0.0.0.0 --port=80'
+    command: flask run --host=0.0.0.0 --port=80
+    # Infinite loop, to keep it alive, for debugging
+    # command: bash -c "while true; do echo 'sleeping...' && sleep 10; done"
+
+  selenium-hub:
+    image: selenium/hub:3.141
+    container_name: selenium-hub
+    ports:
+      - 4444:4444
+
+  chrome:
+    shm_size: 2g
+    volumes:
+      - /dev/shm:/dev/shm
+    image: selenium/node-chrome:3.141
+#    image: selenium/standalone-chrome:3.141.59-copernicium
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
